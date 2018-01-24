@@ -1,1 +1,5 @@
-# enkov_microservices
+### Homework 14
+
+Был установлен docker, настроена возможность docker без sudo.
+
+Изучены основные команды для работы с docker.
