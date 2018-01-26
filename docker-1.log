@@ -1,0 +1,18 @@
+docker images
+REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE
+enkov/ubuntu-tmp-file       latest              e33a870270d5        38 seconds ago      111MB
+ubuntu                      16.04               2a4cca5ac898        8 days ago          111MB
+williamyeh/ansible          ubuntu16.04         1451e3a36bdc        5 weeks ago         453MB
+alpine                      latest              e21c333399e0        7 weeks ago         4.14MB
+ansible/ansible             default             176a81450584        2 months ago        1.87GB
+hello-world                 latest              f2a91732366c        2 months ago        1.85kB
+mysql                       latest              3e3878acd190        3 months ago        412MB
+xujinkai/aria2-with-webui   latest              45c6c1aff1b3        5 months ago        28.5MB
+
+
+docker inspect e33a870270d5 (image)
+docker inspect 23583ba6ba92 (container)
+
+В выводе команды docker inspect примененной к контейнеру намного больше информации,
+т.к. контейнер наследуют параметры образа, из которого был создан и дополняется дполнительной информацией,
+которая появляется после запуска контейнера(информация о сети, состоянии и т.д.).
