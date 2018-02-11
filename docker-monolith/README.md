@@ -46,7 +46,7 @@ docker tag reddit:latest aardvarkx1/otus-reddit:1.0
 docker push aardvarkx1/otus-reddit:1.0
 ```
 
-### Homework 15
+### Homework 16
 
 Создание докер образов.
 
@@ -95,3 +95,39 @@ docker run -d --network=reddit --network-alias=post aardvarkx1/post:1.0
 docker run -d --network=reddit --network-alias=comment aardvarkx1/comment:1.0
 docker run -d --network=reddit -p 9292:9292 aardvarkx1/ui:2.0
 ```
+
+### Homework 17
+
+Изучение сетей и docker-compose
+
+При запуске```docker run --network host -d nginx``` будет запущен одни контейнер,
+т.к. используется host сеть и порт 80 может занять только одно приложение
+
+----
+
+Повторите запуски контейнеров с использованием драйверов
+none и host и посмотрите, как меняется список namespace-ов
+
+Если запускать контейнер с драйвером none, то создается новый namespace,
+а если запускать с драйвером host то namespace не создается
+
+---
+
+Создаем 2 сети. Запускаем контейнеры и добавляем их с сеть.
+```bash
+docker network create back_net --subnet=10.0.2.0/24
+docker network create front_net --subnet=10.0.1.0/24
+
+docker run -d --network=front_net -p 9292:9292 --name ui  aardvarkx1/ui:1.0
+docker run -d --network=back_net --name comment  aardvarkx1/comment:1.0
+docker run -d --network=back_net --name post  aardvarkx1/post:1.0
+docker run -d --network=back_net --name mongo_db --network-alias=post_db --network-alias=comment_db mongo:latest
+
+docker network connect front_net post
+docker network connect front_net comment
+```
+
+---
+
+Имя проекта в docker-compose можно задать с помощью флага ```-p``` или установив переменную окружения ```COMPOSE_PROJECT_NAME```
+
