@@ -130,7 +130,7 @@ docker network connect front_net comment
 
 Имя проекта в docker-compose можно задать с помощью флага ```-p``` или установив переменную окружения ```COMPOSE_PROJECT_NAME```
 
-### Homework 18
+### Homework 19
 
 Создаем директории для gitlab.
 
