@@ -177,3 +177,106 @@ git push gitlab docker-6
 Можно использовать [runners autoscale configuration](https://docs.gitlab.com/runner/configuration/autoscale.html)
 
 Интеграция со slack была настроена по [мануалу](https://gitlab.com/help/user/project/integrations/slack.md)
+
+### Homework 21
+
+Создаем правила файрвола
+
+```bash
+gcloud compute firewall-rules create prometheus-default --allow tcp:9090
+gcloud compute firewall-rules create puma-default --allow tcp:9292
+```
+
+Запускаем виртуальную машину с docker c помощью docker-machine
+
+```bash
+docker-machine create --driver google \
+    --google-machine-image https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts \
+    --google-machine-type n1-standard-1 \
+    vm1
+```
+
+Настраиваем переменные окружения для работы с докером на удаленном хосте
+
+```bash
+eval $(docker-machine env vm1)
+```
+
+Запускаем контейнер с prometheus
+
+```bash
+docker run --rm -p 9090:9090 -d --name prometheus  prom/prometheus
+```
+
+Собираем все образа приложения
+
+```bash
+for i in ui post-py comment; do cd src/$i; bash docker_build.sh; cd -; done
+```
+
+Запускаем приложение и мониторинг
+
+```bash
+docker-compose up -d
+```
+
+Проверяем что все работает.
+
+Останавливаем контейнер post для проверки что мониторинг работает правильно
+
+```bash
+docker-compose stop post
+```
+
+Запускаем контейнер обратно
+
+```bash
+docker-compose start post
+```
+
+Задание со звездочкой 1
+
+Мониторинг mongodb
+
+Для мониторинга mongodb был выбран экспортер от percona. Подготовлен докер файл для сборки контейнера.
+Параметры для подключения к базе задаются через переменную окружения, указанную в docker-compose
+
+```bash
+environment:
+  MONGODB_URL: 'mongodb://post_db:27017'
+```
+
+Задание со звездочкой 2
+
+Мониторинг приложения с помощьб blackbox-exporter
+
+Подготовлен докер файл для сборки контейнера.
+
+Для того чтобы экспортер работал правильно необходимо правильно его настроить в prometheus.yml
+
+```bash
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+        - http://comment:9292/healthcheck
+        - http://post:5000/healthcheck
+        - http://ui:9292/healthcheck
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+```
+
+где в ```replacement: blackbox-exporter:9115``` нужно указать адрес экспортера, а в ```targets``` url, которые нужно мониторить
+
+Задание со звездочкой 3
+
+Был написал Makefile, который может собрать все контейнеры для мониторинга, а так же залить из в докер хаб.
+
+Если в консоли набрать ```make```, то будет выведена справка с возможными аргументами для make.
