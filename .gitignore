@@ -1,0 +1,7 @@
+build_info.txt
+
+## python specific
+*.pyc
+.env
+monitoring/blackbox_exporter/blackbox_exporter
+monitoring/mongodb_exporter/mongodb_exporter
