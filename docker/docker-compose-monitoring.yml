@@ -1,0 +1,101 @@
+version: '3.3'
+services:
+  prometheus:
+    image: ${USER_NAME}/prometheus
+    ports:
+      - '9090:9090'
+    networks:
+      front_net:
+      back_net:
+
+  node-exporter:
+    image: prom/node-exporter
+    user: root
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+    networks:
+      front_net:
+      back_net:
+
+  mongodb-exporter:
+    image: ${USER_NAME}/mongodb_exporter
+    environment:
+      MONGODB_URL: 'mongodb://post_db:27017'
+    networks:
+      front_net:
+      back_net:
+
+  blackbox-exporter:
+    image: ${USER_NAME}/blackbox_exporter
+    networks:
+      front_net:
+      back_net:
+
+  cadvisor:
+    image: google/cadvisor:v0.29.0
+    volumes:
+      - '/:/rootfs:ro'
+      - '/var/run:/var/run:rw'
+      - '/sys:/sys:ro'
+      - '/var/lib/docker/:/var/lib/docker:ro'
+    ports:
+      - '8080:8080'
+    networks:
+      front_net:
+      back_net:
+
+  grafana:
+    image: grafana/grafana:5.0.0-beta4
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - /tmp/prometheus.yaml:/etc/grafana/provisioning/datasources/prometheus.yaml
+      - /tmp/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - /tmp/dashboards/:/tmp/dashboards/
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=secret
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    networks:
+      front_net:
+      back_net:
+
+  alertmanager:
+    image: ${USER_NAME}/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+    ports:
+      - 9093:9093
+    networks:
+      front_net:
+      back_net:
+
+  stackdriver_exporter:
+    image: frodenas/stackdriver-exporter
+    volumes:
+      - /tmp/docker-30b712ea8f7d.json:/tmp/docker-30b712ea8f7d.json
+    command:
+      - '--google.project-id=docker-193413'
+      - '--monitoring.metrics-type-prefixes=compute.googleapis.com/instance/cpu,compute.googleapis.com/instance/disk'
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/docker-30b712ea8f7d.json
+    ports:
+      - 9255:9255
+    networks:
+      front_net:
+      back_net:
+
+volumes:
+  grafana_data:
+
+networks:
+  front_net:
+  back_net:
