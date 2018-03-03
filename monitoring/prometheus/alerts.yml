@@ -1,0 +1,36 @@
+groups:
+  - name: alert.rules
+    rules:
+    - alert: InstanceDown
+      expr: up == 0
+      for: 1m
+      labels:
+        severity: page
+      annotations:
+        description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute'
+        summary: 'Instance {{ $labels.instance }} down'
+
+    - alert: High95Percentile
+      expr: histogram_quantile(0.95, sum(rate(ui_request_latency_seconds_bucket[1m])) by (le)) > 0.5
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        description: '{{ $labels.instance }} of job {{ $labels.job }} has high 95 percentile for more than 1 minute'
+        summary: 'Instance {{ $labels.instance }} High95Percentile'
+
+    - alert: InstanceLowMemory
+      expr: node_memory_MemAvailable < 268435456
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{$labels.instance}} has less than 256M memory available"
+    
+    - alert: InstanceLowDisk
+      expr: node_filesystem_avail{mountpoint="/"} < 5242880000
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{$labels.instance}} has less than 5G FS space"

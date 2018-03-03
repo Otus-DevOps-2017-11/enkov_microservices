@@ -34,43 +34,6 @@ services:
           - comment
       back_net:
 
-  prometheus:
-    image: ${USER_NAME}/prometheus
-    ports:
-      - '9090:9090'
-    networks:
-      front_net:
-      back_net:
-
-  node-exporter:
-    image: prom/node-exporter
-    user: root
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
-    networks:
-      front_net:
-      back_net:
-
-  mongodb-exporter:
-    image: ${USER_NAME}/mongodb_exporter
-    environment:
-      MONGODB_URL: 'mongodb://post_db:27017'
-    networks:
-      front_net:
-      back_net:
-
-  blackbox-exporter:
-    image: ${USER_NAME}/blackbox_exporter
-    networks:
-      front_net:
-      back_net:
-
 volumes:
   post_db:
 

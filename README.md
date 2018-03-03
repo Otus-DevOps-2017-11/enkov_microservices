@@ -280,3 +280,104 @@ environment:
 Был написал Makefile, который может собрать все контейнеры для мониторинга, а так же залить из в докер хаб.
 
 Если в консоли набрать ```make```, то будет выведена справка с возможными аргументами для make.
+
+### Homework 23
+
+Ссылка на [докер хаб](https://hub.docker.com/u/aardvarkx1/)
+
+Создадим правила файрвола
+
+```bash
+gcloud compute firewall-rules create cadvisor-default --allow tcp:8080
+gcloud compute firewall-rules create grafana-default --allow tcp:3000
+gcloud compute firewall-rules create alertmanager-default --allow tcp:9093
+```
+
+Разделим docker-compose файл на 2. Один для приложения второй для мониторинга.
+
+В мониторинг добавим alertmanager, grafana, cadvisor.
+
+Задние со звездочной 1
+
+В Makefile были добавлены новые сервисы
+
+Задние со звездочной 2
+
+Для того чтобы собирать метрики с докера нужно включить экспорт метрик в докер демоне
+
+```bash
+{
+  "metrics-addr" : "0.0.0.0:9323",
+  "experimental" : true
+}
+```
+И добавить в конфиг prometheus сбор метрик с докера
+
+```bash
+- job_name: 'docker'
+  static_configs:
+    - targets:
+      - '10.128.0.2:9323'
+```
+
+Адрес для сбора метрик - приватный ip виртуальной машины, т.к. prometheus запущен в контейнере.
+
+Задние со звездочной 3
+
+В конфиг алертинга для prometheus были добалены алерты:
+
+- Алерт на 95 перцинтиль времени ответа UI
+- Алерт на сободное место на диске
+- Алерт на свободную ОЗУ
+
+Задние со звездочной 4
+
+Для настройки одновременной отправки алертов в слак и на почту нужно сделать объединенный receiver
+
+```bash
+receivers:
+- name: 'slack_email'
+  slack_configs:
+  - channel: '#petr-enkov'
+  email_configs:
+  - to: 'someone@example.com'
+
+```
+
+Задание с двумя звездочками 1
+
+Для того чтобы grafana брала конфигураци из фалов нужно в docker-compose примонтировать эти файлы:
+
+```bash
+volumes:
+  - /tmp/prometheus.yaml:/etc/grafana/provisioning/datasources/prometheus.yaml
+  - /tmp/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+  - /tmp/dashboards/:/tmp/dashboards/
+```
+
+В файлах дашбордов нужно поменять источник на тот, который указан в создании источника
+
+```bash
+"datasource": "Prometheus_t"
+```
+
+Задание с двумя звездочками 2
+
+Для сбора метрик со Stackdriver был использован stackdriver_exporter.
+Для того чтобы stackdriver_exporter мог собирать метрики нужно создать IAM роль для чтения метрик и предать файл в контейнр
+
+```bash
+stackdriver_exporter:
+  image: frodenas/stackdriver-exporter
+  volumes:
+    - /tmp/docker-30b712ea8f7d.json:/tmp/docker-30b712ea8f7d.json
+  command:
+    - '--google.project-id=docker-193413'
+    - '--monitoring.metrics-type-prefixes=compute.googleapis.com/instance/cpu,compute.googleapis.com/instance/disk'
+  environment:
+    - GOOGLE_APPLICATION_CREDENTIALS=/tmp/docker-30b712ea8f7d.json
+  ports:
+    - 9255:9255
+```
+
+Удалось собрать метрики по загрузке диска, процессора.

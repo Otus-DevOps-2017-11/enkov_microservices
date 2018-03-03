@@ -1,0 +1,18 @@
+global:
+  smtp_auth_username: 'somebody@example.com'
+  smtp_auth_password: '13465'
+  smtp_from: 'somebody@example.com'
+  smtp_smarthost: 'smtp.yandex.ru:465'
+  smtp_require_tls: false
+
+  slack_api_url: 'https://hooks.slack.com/services/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'
+
+route:
+  receiver: 'slack_email'
+
+receivers:
+- name: 'slack_email'
+  slack_configs:
+  - channel: '#petr-enkov'
+  email_configs:
+  - to: 'someone@example.com'
