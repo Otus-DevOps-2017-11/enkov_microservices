@@ -18,6 +18,9 @@ build_comment: ## Build comment
 build_post: ## Build post
 	cd src/post-py && bash docker_build.sh
 
+build_fluentd: ## Build fluentd
+	docker build -t $(USER_NAME)/fluentd:$(DOCKER_TAG) docker/fluentd
+
 build_prometheus: ## Build prometheus
 	docker build -t $(USER_NAME)/prometheus:$(DOCKER_TAG) monitoring/prometheus
 
