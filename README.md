@@ -386,3 +386,80 @@ stackdriver_exporter:
 ### Homework 25
 
 Развертывание логирования для приложения
+
+### Homework 26
+
+Создаем машины
+
+```bash
+docker-machine create --driver google \
+   --google-project docker-193413  \
+   --google-zone europe-west1-b \
+   --google-machine-type g1-small \
+   --google-machine-image $(gcloud compute images list --filter ubuntu-1604-lts --uri) \
+   master-1
+
+docker-machine create --driver google \
+   --google-project docker-193413  \
+   --google-zone europe-west1-b \
+   --google-machine-type g1-small \
+   --google-machine-image $(gcloud compute images list --filter ubuntu-1604-lts --uri) \
+   node-1
+
+docker-machine create --driver google \
+   --google-project docker-193413  \
+   --google-zone europe-west1-b \
+   --google-machine-type g1-small \
+   --google-machine-image $(gcloud compute images list --filter ubuntu-1604-lts --uri) \
+   node-2
+```
+
+Инициализируем кластер
+
+```bash
+docker-machine ssh master-1
+docker swarm init
+```
+
+Добавляем ноды в кластер
+
+```bash
+docker swarm join --token SWMTKN-1-447nkoml9kyd89l5bbqbsbjoi5z8cd20ot3gwucr9racdwo6ep-51op5m9143u1wbfj64eryswz9 10.132.0.2:2377
+```
+
+Смотрим что все ноды добавлены
+
+```bash
+docker node ls
+```
+
+Деплоим приложение
+
+```bash
+docker stack deploy --compose-file=<(docker-compose -f docker-compose.yml config 2>/dev/null) DEV
+```
+
+Для управления количеством реплик в ручную используем команду
+
+```bash
+docker service update --replicas 3 DEV_ui
+```
+
+Задание со *
+
+При добавлении новой ноды сервисы начинают стартовать на ней т.к. она меньше всех загружена
+
+Задание со ***
+
+Для выбора необходимого файла с переменными окружения нужно добавить в докер композ
+
+```bash
+    env_file:
+      - .env
+```
+и создать файлы переменных
+
+- env_DEV
+- env_STAGING
+- env_PROD
+
