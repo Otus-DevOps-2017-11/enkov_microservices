@@ -31,7 +31,7 @@ build_blackbox_exporter: ## Build blackbox_exporter
 	docker build -t $(USER_NAME)/blackbox_exporter:$(DOCKER_TAG) monitoring/blackbox_exporter
 
 build_alertmanager: ## Build alertmanager
-	docker build -t $(USER_NAME)/prometheus:$(DOCKER_TAG) monitoring/alertmanager
+	docker build -t $(USER_NAME)/alertmanager:$(DOCKER_TAG) monitoring/alertmanager
 
 build_all: build_ui build_comment build_post build_prometheus build_mongodb_exporter build_blackbox_exporter build_alertmanager ## Build all images
 
