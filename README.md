@@ -463,3 +463,8 @@ docker service update --replicas 3 DEV_ui
 - env_STAGING
 - env_PROD
 
+### Homework 28
+
+Изучение основ kubernetes.
+
+Был развернут kubernetes кластер по мануалу kubernetes The Hard way
