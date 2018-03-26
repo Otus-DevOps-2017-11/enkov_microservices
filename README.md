@@ -468,3 +468,102 @@ docker service update --replicas 3 DEV_ui
 Изучение основ kubernetes.
 
 Был развернут kubernetes кластер по мануалу kubernetes The Hard way
+
+### Homework 29
+
+Развертывание и спользование kubernetes с помощью minikube и GCP.
+
+```bash
+minikube start
+```
+
+```bash
+kubectl get nodes
+```
+
+```bash
+kubectl config current-context
+```
+
+```bash
+kubectl config get-contexts
+```
+
+```bash
+kubectl apply -f ui-deployment.yml
+```
+
+```bash
+kubectl get deployment
+```
+
+```bash
+kubectl get pods --selector component=ui
+```
+
+```bash
+kubectl port-forward ui-766b67bd46-lv2kg 8181:9292
+```
+
+```bash
+kubectl port-forward post-57968fff8d-2lsjs 8181:5000
+```
+
+```bash
+kubectl port-forward comment-688db68cbd-t2hz4 8181:9292
+```
+
+```bash
+kubectl describe service post | grep Endpoints
+```
+
+```bash
+kubectl exec -ti comment-688db68cbd-t2hz4 ping -c 1 post
+```
+
+```bash
+kubectl port-forward ui-766b67bd46-lv2kg 9292:9292
+```
+
+```bash
+kubectl logs comment-65c46f9cd-ts7js
+```
+
+```bash
+kubectl delete -f mongodb-service.yml
+```
+
+```bash
+minikube service ui
+```
+
+```bash
+minikube service list
+```
+
+```bash
+minikube addons list
+```
+
+```bash
+minikube addons enable dashboard
+```
+
+```bash
+kubectl get all  -n kube-system --selector app=kubernetes-dashboard
+```
+
+```bash
+minikube service kubernetes-dashboard -n kube-system
+```
+
+Задание со звездочкой
+
+Развертываение kubernetes с помощью терраформ
+
+Все конфиг файлы для терраформ лежат в папке kubernetes/terraform
+
+YAML-манифесты для dashboard:
+
+- dashboard_clusterrolebinding.yml
+- dashboard_deployment.yml

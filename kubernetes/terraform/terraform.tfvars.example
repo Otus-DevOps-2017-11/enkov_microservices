@@ -1,0 +1,5 @@
+username = "superuser"
+password = "ymvnE84bnNQQMcMhskW2Rad7UoV7iE"
+kubernetes_version = "1.8.8-gke.0"
+cluster_name = "test-cluster1"
+project = "docker-193413"
