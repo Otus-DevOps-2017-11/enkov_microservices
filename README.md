@@ -567,3 +567,95 @@ YAML-манифесты для dashboard:
 
 - dashboard_clusterrolebinding.yml
 - dashboard_deployment.yml
+
+
+### Homework 30
+
+Изучение сетей и хранилищ в kubernetes
+
+Создание ingress
+
+```bash
+kubectl apply -f ui-ingress.yml -n dev
+```
+
+Получаем список доступных ingress
+
+```bash
+kubectl get ingress -n dev
+```
+
+Создаем ssl сертификаты и загружаем их в kubernetes
+
+```bash
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=35.186.236.198"
+
+kubectl create secret tls ui-ingress --key tls.key --cert tls.crt -n dev
+
+kubectl describe secret ui-ingress -n dev
+```
+
+Так же загрузить секреты можно с помощью созданного манифеста
+
+```bash
+kubectl apply -f ui-secret.yml -n dev
+```
+
+После применения правила, которое разрешает использовать https, http остался рабочим.
+Пришлось пересоздать ingress.
+
+```bash
+kubectl delete ingress ui -n dev
+
+kubectl apply -f ui-ingress.yml -n dev
+```
+
+Включаем поддержку network policy
+
+```bash
+gcloud beta container clusters list
+gcloud beta container clusters update test-cluster1 --zone=europe-west1-b --update-addons=NetworkPolicy=ENABLED
+gcloud beta container clusters update test-cluster1 --zone=europe-west1-b  --enable-network-policy
+```
+
+Создаем диск
+
+```bash
+gcloud compute disks create --size=25GB --zone=europe-west1-b reddit-mongo-disk
+```
+
+Создаем persisten volume
+
+```bash
+kubectl apply -f mongo-volume.yml -n dev
+```
+
+Создаем PersistentVolumeClaim
+
+```bash
+kubectl apply -f mongo-claim.yml -n dev
+```
+
+Создаем StorageClass и dynamic claim
+
+```bash
+kubectl apply -f mongo-deployment.yml -n dev
+
+kubectl apply -f storage-fast.yml -n dev
+
+kubectl apply -f mongo-claim-dynamic.yml -n dev
+```
+
+Пересоздаем деплоймент mongo
+
+```bash
+kubectl delete deploy mongo -n dev
+
+kubectl apply -f mongo-deployment.yml -n dev
+```
+
+Смотрим какие persistentvolume есть
+
+```bash
+kubectl get persistentvolume -n dev
+```
