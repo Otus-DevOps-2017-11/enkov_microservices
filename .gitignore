@@ -5,3 +5,6 @@ build_info.txt
 .env
 monitoring/blackbox_exporter/blackbox_exporter
 monitoring/mongodb_exporter/mongodb_exporter
+.terraform/
+terraform.tfvars
+terraform.tfstate
