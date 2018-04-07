@@ -660,7 +660,7 @@ kubectl apply -f mongo-deployment.yml -n dev
 kubectl get persistentvolume -n dev
 ```
 
-### Homework 30
+### Homework 31
 
 CI/CD в Kubernetes
 
