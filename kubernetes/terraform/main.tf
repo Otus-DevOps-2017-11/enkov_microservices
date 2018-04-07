@@ -23,7 +23,7 @@ resource "google_container_cluster" "primary" {
 
   node_version = "${var.kubernetes_version}"
 min_master_version = "${var.kubernetes_version}"
-enable_legacy_abac = false
+enable_legacy_abac = true
 
 //   additional_zones = [
 //     "${data.google_compute_zones.available.names[1]}",
@@ -47,13 +47,13 @@ enable_legacy_abac = false
 
 addons_config {
   http_load_balancing {
-    disabled = true
+    disabled = false
   }
   horizontal_pod_autoscaling {
     disabled = true
   }
   kubernetes_dashboard {
-    disabled = true
+    disabled = false
   }
 }
 
