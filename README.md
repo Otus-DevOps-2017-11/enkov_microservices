@@ -659,3 +659,34 @@ kubectl apply -f mongo-deployment.yml -n dev
 ```bash
 kubectl get persistentvolume -n dev
 ```
+
+### Homework 31
+
+CI/CD в Kubernetes
+
+Установка helm
+
+```bash
+kubectl apply -f tiller.yml
+helm init --service-account tiller
+```
+
+Запуск приложения через helm
+
+```bash
+helm install --name test-ui-1 ui/
+```
+
+Поиск готовых пакетом для helm
+
+```bash
+helm search mongo
+```
+
+Установка gitlab
+
+```bash
+helm repo add gitlab https://charts.gitlab.io
+helm fetch gitlab/gitlab-omnibus --version 0.1.36 --untar
+helm install --name gitlab . -f values.yaml
+```
