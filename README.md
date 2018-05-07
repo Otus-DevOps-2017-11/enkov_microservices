@@ -690,3 +690,49 @@ helm repo add gitlab https://charts.gitlab.io
 helm fetch gitlab/gitlab-omnibus --version 0.1.36 --untar
 helm install --name gitlab . -f values.yaml
 ```
+
+### Homework 32
+
+Мониторинг и логирование в kubernetes
+
+Установка nginx-ingress
+
+```bash
+helm install stable/nginx-ingress --name nginx
+```
+
+Развертывание мониторинга
+
+```bash
+helm upgrade prom . -f custom_values.yml --install
+```
+
+Проверка что метрики экспортируются
+
+```bash
+gcloud compute --project "docker-193413" ssh --zone "europe-west2-b" "gke-cluster-1-default-pool-93864766-fqd4"
+curl http://localhost:4194/metrics
+```
+
+Установка grafana
+
+```bash
+helm upgrade --install grafana stable/grafana --set "server.adminPassword=admin" \
+--set "server.service.type=NodePort" \
+--set "server.ingress.enabled=true" \
+--set "server.ingress.hosts={reddit-grafana}"
+```
+
+Установка efk
+
+```bash
+kubectl label node  gke-cluster-1-default-pool-93864766-fqd4 elastichost=true
+
+kubectl apply -f ./efk
+
+helm upgrade --install kibana stable/kibana \
+--set "ingress.enabled=true" \
+--set "ingress.hosts={reddit-kibana}" \
+--set "env.ELASTICSEARCH_URL=http://elasticsearch-logging:9200" \
+--version 0.1.1
+```

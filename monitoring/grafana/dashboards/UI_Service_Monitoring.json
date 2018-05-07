@@ -14,7 +14,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "5.0.0-beta4"
+      "version": "5.0.4"
     },
     {
       "type": "panel",
@@ -46,6 +46,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": null,
+  "iteration": 1523192966603,
   "links": [],
   "panels": [
     {
@@ -53,7 +54,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus_t",
+      "datasource": "${DS_PROMETHEUS}",
       "fill": 1,
       "gridPos": {
         "h": 9,
@@ -85,7 +86,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum(rate(ui_request_latency_seconds_bucket[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(ui_request_latency_seconds_bucket{kubernetes_namespace=~\"$namespace\"}[5m])) by (le))",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -132,7 +133,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus_t",
+      "datasource": "${DS_PROMETHEUS}",
       "fill": 1,
       "gridPos": {
         "h": 9,
@@ -164,7 +165,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(ui_request_count{http_status=~\"^[45].*\"}[1m])",
+          "expr": "rate(ui_request_count{http_status=~\"^[45].*\", kubernetes_namespace=~\"$namespace\"}[1m])",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -211,7 +212,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus_t",
+      "datasource": "${DS_PROMETHEUS}",
       "description": "All HTTP requests that UI service receives",
       "fill": 1,
       "gridPos": {
@@ -244,7 +245,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(ui_request_count[1m])",
+          "expr": "rate(ui_request_count{kubernetes_namespace=~\"$namespace\"}[1m])",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -291,7 +292,28 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "${DS_PROMETHEUS}",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Env",
+        "multi": true,
+        "name": "namespace",
+        "options": [],
+        "query": "label_values(namespace)",
+        "refresh": 1,
+        "regex": "/.+/",
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
   },
   "time": {
     "from": "now-30m",
